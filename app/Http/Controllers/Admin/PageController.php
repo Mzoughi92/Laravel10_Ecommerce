@@ -1,0 +1,151 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\PageModel;
+use App\Models\SystemSettingModel;
+use Str;
+class PageController extends Controller
+{
+    public function list()
+    {    
+            $data['getRecord'] = PageModel::getRecord();
+            $data['header_title'] = "PageADMIN LISTE";
+            return view('admin.page.index', $data);
+    }
+
+
+ 
+
+    public function edit($id)
+    {    
+            $data['getRecord'] = PageModel::getSingle($id);
+            $data['header_title'] = "EDIT PAGE LISTE";
+            return view('admin.page.edit', $data);
+    }
+
+
+
+    public function update($id, Request $request)
+    {
+       // dd($request->all());
+        $page = PageModel::getSingle($id);
+        $page->name = trim($request->name);
+        $page->title = trim($request->title);
+        $page->description = trim($request->description);
+        $page->meta_title = trim($request->meta_title);
+        $page->meta_description = trim($request->meta_description);
+        $page->meta_keywords = trim($request->meta_keywords);
+        $page->save();
+
+        
+        if(!empty($request->file('image')))
+        {
+          
+              $file = $request->file('image');
+                $ext = $file->getClientOriginalExtension();
+                $randomStr = $page->id.Str::random(20);
+                 $filename = strtolower($randomStr).'.'.$ext;
+                 $file->move('upload/page/', $filename);
+
+                 $page->image_name = trim($filename);
+                 $page->save();
+ 
+        }
+
+
+
+            return redirect('admin/page/list')->with('success', "SUCCESS")  ;
+    }
+
+
+    public function system_setting()
+    {
+        $data['getRecord'] = SystemSettingModel::getSingle();
+        $data['header_title'] = "system setting";
+        return view('admin.setting.system_setting', $data);
+    }
+
+
+    public function update_system_setting(Request $request)
+    {
+       $save = SystemSettingModel::getSingle();
+       $save->website_name = trim($request->website_name);
+       $save->logo = trim($request->logo);
+       $save->fevicon = trim($request->fevicon);
+       $save->footer_description = trim($request->footer_description);
+       $save->footer_payment_icon = trim($request->footer_payment_icon);
+       $save->address = trim($request->address);
+       $save->phone = trim($request->phone);
+       $save->phone_tow = trim($request->phone_tow);
+       $save->submit_email = trim($request->submit_email);
+       $save->email = trim($request->email);
+       $save->email_tow = trim($request->email_tow);
+       $save->working_hour = trim($request->working_hour);
+       $save->facebook_link = trim($request->facebook_link);
+       $save->instagram_link = trim($request->instagram_link);
+       $save->youtube_link = trim($request->youtube_link);
+       $save->pinterest_link = trim($request->pinterest_link);
+
+           
+       if(!empty($request->file('logo')))
+       {
+         
+             $file = $request->file('logo');
+               $ext = $file->getClientOriginalExtension();
+               $randomStr = Str::random(10);
+                $filename = strtolower($randomStr).'.'.$ext;
+                $file->move('upload/setting/', $filename);
+
+                $save->logo = trim($filename);
+          
+
+       }
+
+
+
+       
+       if(!empty($request->file('fevicon')))
+       {
+         
+             $file = $request->file('fevicon');
+               $ext = $file->getClientOriginalExtension();
+               $randomStr = Str::random(10);
+                $filename = strtolower($randomStr).'.'.$ext;
+                $file->move('upload/setting/', $filename);
+
+                $save->fevicon = trim($filename);
+          
+
+       }
+
+
+
+       if(!empty($request->file('footer_payment_icon')))
+       {
+             $file = $request->file('footer_payment_icon');
+               $ext = $file->getClientOriginalExtension();
+               $randomStr = Str::random(10);
+                $filename = strtolower($randomStr).'.'.$ext;
+                $file->move('upload/setting/', $filename);
+                $save->footer_payment_icon = trim($filename);
+       }
+
+
+
+       $save->save();
+
+       return redirect()->back()->with('success', "Setting Successfully Updated");
+     // dd($request->all());
+    }
+
+    
+
+    
+  
+
+
+
+}
